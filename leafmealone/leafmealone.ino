@@ -70,8 +70,9 @@ Adafruit_VS1053_FilePlayer musicPlayer =
 #define CAP1188_CLK  13
 #define CAP1188_SENSITIVITY_REG 0x1F
 
-#define NUM_AUDIO_FILES 13
-
+#define NUM_AUDIO_FILES 15
+String const FILE_PREFIX = "/track00";
+String const FILE_TYPE = ".mp3";
 
 // For I2C, connect SDA to your Arduino's SDA pin, SCL to SCL pin
 // On UNO/Duemilanove/etc, SDA == Analog 4, SCL == Analog 5
@@ -79,7 +80,7 @@ Adafruit_VS1053_FilePlayer musicPlayer =
 // I2C, with reset pin
 Adafruit_CAP1188 cap = Adafruit_CAP1188(CAP1188_RESET);
 // sensitivity level, lower is more sensitive
-const int CAP1188_SENSITIVITY_LVL = 0x47;
+const int CAP1188_SENSITIVITY_LVL = 0x57;
 // track which audio file should be played
 int audio_index;
 // bit vector of which caps were touched last time
@@ -136,67 +137,14 @@ void loop() {
 
   //play audio file if something changed
   if (touched ^ prev_touched) {
-      switch (audio_index) {
-        case 0:
-          Serial.println("0");
-          musicPlayer.playFullFile("/track000.mp3");
-          break;
-        case 1:
-          Serial.println("1");
-          musicPlayer.playFullFile("/track00A.mp3");
-          break;
-        case 2:
-          Serial.println("2");
-          musicPlayer.playFullFile("/track00B.mp3");
-          break;
-        case 3:
-          Serial.println("3");
-          musicPlayer.playFullFile("/track00C.mp3");
-          break;
-        case 4:
-          Serial.println("4");
-          musicPlayer.playFullFile("/track001.mp3");
-          break;
-        case 5:
-          Serial.println("5");
-          musicPlayer.playFullFile("/track002.mp3");
-          break;
-        case 6:
-          Serial.println("6");
-          musicPlayer.playFullFile("/track003.mp3");
-          break;
-        case 7:
-          Serial.println("7");
-          musicPlayer.playFullFile("/track004.mp3");
-          break;
-        case 8:
-          Serial.println("8");
-          musicPlayer.playFullFile("/track005.mp3");
-          break;
-        case 9:
-          Serial.println("9");
-          musicPlayer.playFullFile("/track006.mp3");
-          break;
-        case 10:
-          Serial.println("10");
-          musicPlayer.playFullFile("/track007.mp3");
-          break;
-        case 11:
-          Serial.println("11");
-          musicPlayer.playFullFile("/track008.mp3");
-          break;
-        case 12:
-          Serial.println("12");
-          musicPlayer.playFullFile("/track009.mp3");
-          break;
-        default:
-          Serial.println("default");
-          break;
-      }
-
-      audio_index += 1;
-      audio_index = audio_index % NUM_AUDIO_FILES;
-    }
+    String f = FILE_PREFIX + String(audio_index,HEX) + FILE_TYPE;
+    char _f[f.length() + 1];
+    f.toCharArray(_f, sizeof(_f));
+    musicPlayer.playFullFile(_f);
+    Serial.println(f);
+    audio_index += 1;
+    audio_index = audio_index % NUM_AUDIO_FILES;
+  }
   Serial.println();
   delay(500);
 
